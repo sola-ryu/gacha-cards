@@ -158,7 +158,7 @@ function showPackOpening(cards, packId) {
 
   // Reset
   packClosed.classList.remove("hidden");
-  packAnim.classList.remove("hidden");
+  packAnim.classList.add("hidden"); // keep hidden until user clicks
   particles.innerHTML = "";
   overlay.classList.remove("hidden");
 
@@ -168,6 +168,7 @@ function showPackOpening(cards, packId) {
   // Click to open
   packClosed.onclick = () => {
     packClosed.classList.add("hidden");
+    packAnim.classList.remove("hidden"); // show animation after click
 
     if (isLegendary) {
       triggerLegendaryVFX();
