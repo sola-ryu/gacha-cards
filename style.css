@@ -557,6 +557,247 @@ header h1 {
   80% { transform: translateX(4px); }
 }
 
+/* ========== SCREEN SHAKE (legendary VFX) ========== */
+@keyframes screen-shake {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-8px, -5px); }
+  20% { transform: translate(8px, 3px); }
+  30% { transform: translate(-6px, 6px); }
+  40% { transform: translate(6px, -4px); }
+  50% { transform: translate(-4px, 2px); }
+  60% { transform: translate(4px, -3px); }
+  70% { transform: translate(-2px, 4px); }
+  80% { transform: translate(2px, -2px); }
+  90% { transform: translate(-1px, 1px); }
+}
+
+body.shake {
+  animation: screen-shake 0.6s ease-in-out;
+}
+
+/* ========== GOLDEN FLASH OVERLAY ========== */
+.golden-flash {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #fff8e1, #ff9800 30%, transparent 70%);
+  z-index: 150;
+  pointer-events: none;
+  animation: golden-flash-in 0.4s ease-out forwards;
+}
+
+@keyframes golden-flash-in {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ========== LEGENDARY BANNER ========== */
+.legendary-banner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: linear-gradient(135deg, #ff9800, #f57c00, #e65100);
+  color: white;
+  padding: 24px 48px;
+  border-radius: 16px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+  z-index: 160;
+  pointer-events: none;
+  box-shadow: 0 0 60px rgba(255, 152, 0, 0.6), 0 0 120px rgba(255, 152, 0, 0.3);
+  animation: banner-pop 2s ease-out forwards;
+}
+
+.legendary-banner .banner-emoji {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 8px;
+  animation: banner-bounce 1s ease-in-out infinite;
+}
+
+.legendary-banner .banner-text {
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+@keyframes banner-pop {
+  0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+  15% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  25% { transform: translate(-50%, -50%) scale(1.0); opacity: 1; }
+  70% { transform: translate(-50%, -50%) scale(1.0); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+}
+
+@keyframes banner-bounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-6px) rotate(-3deg); }
+  75% { transform: translateY(4px) rotate(3deg); }
+}
+
+/* ========== RARITY-SPECIFIC REVEAL EFFECTS ========== */
+.reveal-card.common {
+  animation: reveal-common 0.4s ease-out forwards;
+}
+
+@keyframes reveal-common {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.reveal-card.uncommon {
+  animation: reveal-uncommon 0.6s ease-out forwards;
+}
+
+@keyframes reveal-uncommon {
+  from { opacity: 0; transform: translateY(30px) scale(0.85); filter: blur(2px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+.reveal-card.rare {
+  animation: reveal-rare 0.8s ease-out forwards;
+}
+
+@keyframes reveal-rare {
+  from { opacity: 0; transform: translateY(40px) scale(0.8); filter: blur(3px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+.reveal-card.rare::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, transparent 30%, rgba(33,150,243,0.3) 50%, transparent 70%);
+  animation: rare-shimmer 2s ease-in-out infinite;
+  z-index: -1;
+}
+
+@keyframes rare-shimmer {
+  0%, 100% { opacity: 0.3; transform: rotate(0deg); }
+  50% { opacity: 0.7; transform: rotate(3deg); }
+}
+
+.reveal-card.epic {
+  animation: reveal-epic 1s ease-out forwards;
+}
+
+@keyframes reveal-epic {
+  from { opacity: 0; transform: translateY(50px) scale(0.7) rotate(-2deg); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); filter: blur(0); }
+}
+
+.reveal-card.epic::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 16px;
+  background: linear-gradient(45deg, transparent 20%, rgba(156,39,176,0.4) 50%, transparent 80%);
+  animation: epic-shimmer-reveal 1.5s ease-in-out infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes epic-shimmer-reveal {
+  0%, 100% { transform: rotate(0deg) scale(1); opacity: 0.4; }
+  50% { transform: rotate(5deg) scale(1.02); opacity: 0.8; }
+}
+
+.reveal-card.legendary {
+  animation: reveal-legendary 1.5s ease-out forwards;
+}
+
+@keyframes reveal-legendary {
+  from { opacity: 0; transform: translateY(60px) scale(0.6) rotate(-3deg); filter: blur(5px); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); filter: blur(0); }
+}
+
+.reveal-card.legendary::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 15px;
+  background: linear-gradient(45deg, transparent 10%, rgba(255,152,0,0.5) 30%, rgba(255,215,0,0.6) 50%, rgba(255,152,0,0.5) 70%, transparent 90%);
+  animation: legend-shimmer-reveal 2s linear infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.reveal-card.legendary::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 18px;
+  background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
+  animation: legend-glow-pulse 2s ease-in-out infinite;
+  z-index: -2;
+  pointer-events: none;
+}
+
+@keyframes legend-shimmer-reveal {
+  0% { transform: rotate(0deg) scale(1); opacity: 0.6; }
+  50% { transform: rotate(10deg) scale(1.03); opacity: 1; }
+  100% { transform: rotate(20deg) scale(1); opacity: 0.6; }
+}
+
+@keyframes legend-glow-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.04); }
+}
+
+/* ========== LEGENDARY CARD HIGHLIGHT (in reveal) ========== */
+.reveal-card.legendary .reveal-card-back {
+  animation: legendary-border-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes legendary-border-pulse {
+  0%, 100% { box-shadow: 0 4px 32px rgba(255,152,0,0.4); }
+  50% { box-shadow: 0 4px 48px rgba(255,152,0,0.7), 0 0 80px rgba(255,215,0,0.3), 0 0 120px rgba(255,152,0,0.2); }
+}
+
+/* ========== LEGENDARY PARTICLES (golden sparkles) ========== */
+.legendary-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, #fff8e1, #ff9800);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: legend-particle-fly 2s ease-out forwards;
+}
+
+@keyframes legend-particle-fly {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--lx), var(--ly)) scale(0); opacity: 0; }
+}
+
+/* ========== RARITY BADGE ON REVEAL CARDS ========== */
+.reveal-rarity-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.reveal-rarity-badge.common { background: var(--common); }
+.reveal-rarity-badge.uncommon { background: var(--uncommon); }
+.reveal-rarity-badge.rare { background: var(--rare); }
+.reveal-rarity-badge.epic { background: var(--epic); }
+.reveal-rarity-badge.legendary { background: linear-gradient(135deg, #ff9800, #ffd600); animation: badge-glow 2s ease-in-out infinite; }
+
+@keyframes badge-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(255,152,0,0.5); }
+  50% { box-shadow: 0 0 16px rgba(255,215,0,0.8); }
+}
+
 /* ========== SETTINGS TAB ========== */
 .settings-panel {
   max-width: 700px;
@@ -895,6 +1136,84 @@ header h1 {
 }
 
 .btn-close-detail:hover { background: rgba(255,255,255,0.15); }
+
+/* ========== PULL HISTORY ========== */
+.pull-history {
+  margin-top: 24px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.pull-history h3 {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.pull-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.pull-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  animation: pullEntryIn 0.3s ease-out;
+  border-left: 3px solid transparent;
+}
+
+.pull-entry.legendary { border-left-color: var(--legendary); background: rgba(255,152,0,0.06); }
+.pull-entry.epic { border-left-color: var(--epic); background: rgba(156,39,176,0.06); }
+.pull-entry.rare { border-left-color: var(--rare); background: rgba(33,150,243,0.06); }
+.pull-entry.uncommon { border-left-color: var(--uncommon); }
+.pull-entry.common { border-left-color: var(--common); opacity: 0.7; }
+
+@keyframes pullEntryIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.pull-emoji {
+  font-size: 1.4rem;
+  min-width: 30px;
+  text-align: center;
+}
+
+.pull-name {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.pull-rarity {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.pull-rarity.common { background: rgba(158,158,158,0.2); color: var(--common); }
+.pull-rarity.uncommon { background: rgba(76,175,80,0.2); color: var(--uncommon); }
+.pull-rarity.rare { background: rgba(33,150,243,0.2); color: var(--rare); }
+.pull-rarity.epic { background: rgba(156,39,176,0.2); color: var(--epic); }
+.pull-rarity.legendary { background: rgba(255,152,0,0.2); color: var(--legendary); animation: badge-glow 2s ease-in-out infinite; }
+
+.pull-time {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
 
 /* ========== RESPONSIVE ========== */
 @media (max-width: 600px) {

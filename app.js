@@ -21,6 +21,7 @@ function defaultState() {
     pityLegendary: 0, // pulls since last legendary
     lastFreeGems: 0,  // timestamp of last free gems
     autoReveal: false,
+    pullHistory: [],   // [{ cardId, name, rarity, emoji, time }]
   };
 }
 
@@ -141,6 +142,14 @@ function getCard(rarity) {
 }
 
 // ========== PACK OPENING ANIMATION ==========
+function hasLegendary(cards) {
+  return cards.some(c => c.rarity === "legendary");
+}
+
+function hasEpic(cards) {
+  return cards.some(c => c.rarity === "epic");
+}
+
 function showPackOpening(cards, packId) {
   const overlay = document.getElementById("pack-overlay");
   const packClosed = document.getElementById("pack-closed");
@@ -149,14 +158,22 @@ function showPackOpening(cards, packId) {
 
   // Reset
   packClosed.classList.remove("hidden");
-  packAnim.classList.add("hidden");
+  packAnim.classList.remove("hidden");
   particles.innerHTML = "";
   overlay.classList.remove("hidden");
+
+  const isLegendary = hasLegendary(cards);
+  const isEpic = hasEpic(cards);
 
   // Click to open
   packClosed.onclick = () => {
     packClosed.classList.add("hidden");
-    packAnim.classList.remove("hidden");
+
+    if (isLegendary) {
+      triggerLegendaryVFX();
+    } else if (isEpic) {
+      triggerEpicVFX();
+    }
 
     // Create particles
     const colors = getParticleColors(cards);
@@ -175,12 +192,47 @@ function showPackOpening(cards, packId) {
       particles.appendChild(p);
     }
 
-    // Show reveal after flash
+    // Show reveal after flash — longer pause for legendary
+    const revealDelay = isLegendary ? animDuration(1500) : animDuration(800);
     setTimeout(() => {
       overlay.classList.add("hidden");
       showReveal(cards);
-    }, animDuration(1000));
+      recordPullHistory(cards);
+    }, revealDelay);
   };
+}
+
+// ========== LEGENDARY VFX ==========
+function triggerLegendaryVFX() {
+  // Screen shake
+  document.body.classList.add("shake");
+  setTimeout(() => document.body.classList.remove("shake"), 600);
+
+  // Golden flash overlay
+  const flash = document.createElement("div");
+  flash.className = "golden-flash";
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 800);
+
+  // Legendary banner
+  const banner = document.createElement("div");
+  banner.className = "legendary-banner";
+  banner.innerHTML = `
+    <span class="banner-emoji">👑</span>
+    <span class="banner-text">LEGENDARY!</span>
+  `;
+  document.body.appendChild(banner);
+  setTimeout(() => banner.remove(), 2200);
+}
+
+// ========== EPIC VFX (lighter version) ==========
+function triggerEpicVFX() {
+  // Purple flash
+  const flash = document.createElement("div");
+  flash.className = "golden-flash";
+  flash.style.background = "radial-gradient(circle at center, #f3e5f5, #9c27b0 30%, transparent 70%)";
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 600);
 }
 
 function getParticleColors(cards) {
@@ -197,11 +249,25 @@ function showReveal(cards) {
   const container = document.getElementById("reveal-container");
   container.innerHTML = "";
 
+  // Rarity badge emoji per tier
+  const BADGE_EMOJI = { common: "·", uncommon: "✦", rare: "★", epic: "✡", legendary: "👑" };
+
   cards.forEach((card, i) => {
     const el = document.createElement("div");
-    el.className = "reveal-card";
-    el.style.animationDelay = (i * 0.1) + "s";
+    // Rarity class drives the animation speed in CSS
+    el.className = `reveal-card ${card.rarity}`;
+    // Legendary cards get wider spacing for dramatic effect
+    const delayMult = card.rarity === "legendary" ? 0.4 : (card.rarity === "epic" ? 0.25 : 0.1);
+    el.style.animationDelay = (i * delayMult) + "s";
+
+    // Legendary particles container
+    let particlesHTML = "";
+    if (card.rarity === "legendary") {
+      particlesHTML = `<div class="legendary-particles"></div>`;
+    }
+
     el.innerHTML = `
+      <div class="reveal-rarity-badge ${card.rarity}">${BADGE_EMOJI[card.rarity]}</div>
       <div class="reveal-card-inner">
         <div class="reveal-card-front">🎴</div>
         <div class="reveal-card-back ${card.rarity}">
@@ -212,6 +278,7 @@ function showReveal(cards) {
           </div>
         </div>
       </div>
+      ${particlesHTML}
     `;
 
     // Click to flip
@@ -224,12 +291,38 @@ function showReveal(cards) {
 
   overlay.classList.remove("hidden");
 
+  // Spawn golden particles on legendary cards
+  if (cards.some(c => c.rarity === "legendary")) {
+    const legendCards = container.querySelectorAll(".reveal-card.legendary");
+    legendCards.forEach(cardEl => spawnLegendaryParticles(cardEl));
+  }
+
   // Auto-flip all after delay if enabled
   if (state.autoReveal) {
-    const flipDelay = animDuration(500);
     document.querySelectorAll(".reveal-card").forEach((el, i) => {
-      setTimeout(() => el.classList.add("flipped"), i * Math.max(animDuration(200), 50));
+      const card = cards[i];
+      // Legendary cards wait longer for dramatic effect
+      const extraDelay = card.rarity === "legendary" ? animDuration(1000) : 0;
+      setTimeout(() => el.classList.add("flipped"), i * Math.max(animDuration(200), 50) + extraDelay);
     });
+  }
+}
+
+// ========== LEGENDARY PARTICLES ==========
+function spawnLegendaryParticles(cardEl) {
+  const container = cardEl.querySelector(".legendary-particles");
+  if (!container) return;
+
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement("div");
+    p.className = "legendary-particle";
+    p.style.left = "50%";
+    p.style.top = "50%";
+    p.style.setProperty("--lx", (Math.random() - 0.5) * 120 + "px");
+    p.style.setProperty("--ly", (Math.random() - 0.5) * 120 + "px");
+    p.style.animationDelay = Math.random() * 3 + "s";
+    p.style.animationDuration = (1.5 + Math.random()) + "s";
+    container.appendChild(p);
   }
 }
 
@@ -512,7 +605,52 @@ function shakeElement(el) {
   setTimeout(() => el.style.animation = "", 400);
 }
 
+// ========== PULL HISTORY ==========
+const PULL_HISTORY_LIMIT = 50;
+
+function recordPullHistory(cards) {
+  for (const card of cards) {
+    state.pullHistory.unshift({
+      cardId: card.id,
+      name: card.name,
+      rarity: card.rarity,
+      emoji: card.emoji,
+      time: Date.now(),
+    });
+  }
+  // Keep only the last N entries
+  if (state.pullHistory.length > PULL_HISTORY_LIMIT) {
+    state.pullHistory = state.pullHistory.slice(0, PULL_HISTORY_LIMIT);
+  }
+  saveState();
+  renderPullHistory();
+}
+
+function renderPullHistory() {
+  const list = document.getElementById("pull-history-list");
+  if (!list) return;
+
+  const pulls = state.pullHistory || [];
+  if (pulls.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:var(--text-secondary);padding:20px;font-size:0.9rem">No pulls yet — start gachaing!</div>';
+    return;
+  }
+
+  list.innerHTML = pulls.map(p => {
+    const timeStr = new Date(p.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return `
+      <div class="pull-entry ${p.rarity}">
+        <span class="pull-emoji">${p.emoji}</span>
+        <span class="pull-name">${p.name}</span>
+        <span class="pull-rarity ${p.rarity}">${p.rarity}</span>
+        <span class="pull-time">${timeStr}</span>
+      </div>
+    `;
+  }).join('');
+}
+
 // ========== INIT ==========
 updateStats();
 updatePityUI();
 renderCollection();
+renderPullHistory();
