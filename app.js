@@ -450,6 +450,59 @@ function updateAnimSpeed(val) {
   label.textContent = ANIM_SPEED_LABELS[animSpeed - 1];
 }
 
+// ========== DATA MANAGEMENT ==========
+function exportState() {
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `gacha-save-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importState() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const imported = JSON.parse(ev.target.result);
+        state = { ...defaultState(), ...imported };
+        saveState();
+        updateStats();
+        renderCollection();
+        updatePityUI();
+        alert("Save data imported successfully! 💾");
+      } catch (err) {
+        alert("Invalid save file. Please check the format.");
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function resetAll() {
+  if (confirm("Are you sure? This will delete ALL your progress, gems, and collection.")) {
+    if (confirm("Really? This cannot be undone!")) {
+      localStorage.removeItem("gacha_state");
+      state = defaultState();
+      updateStats();
+      renderCollection();
+      updatePityUI();
+      alert("All data has been reset. Fresh start! 🆕");
+    }
+  }
+}
+
 // ========== UTILS ==========
 function shakeElement(el) {
   if (!el) return;

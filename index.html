@@ -21,6 +21,7 @@
     <button class="tab active" data-tab="shop">Shop</button>
     <button class="tab" data-tab="collection">Collection</button>
     <button class="tab" data-tab="pity">Pity Counter</button>
+    <button class="tab" data-tab="settings">⚙️ Settings</button>
   </nav>
 
   <!-- SHOP TAB -->
@@ -85,22 +86,6 @@
     <div class="free-gems">
       <button onclick="claimFreeGems()">Claim 50 Free Gems (every 24h)</button>
     </div>
-
-    <div class="settings-section">
-      <h3>⚙️ Settings</h3>
-      <div class="setting-row">
-        <label for="anim-speed">Animation Speed</label>
-        <input type="range" id="anim-speed" min="1" max="5" value="3" step="1" oninput="updateAnimSpeed(this.value)">
-        <span id="anim-speed-label">Normal</span>
-      </div>
-      <div class="setting-row">
-        <label for="auto-reveal">Auto-Reveal Cards</label>
-        <label class="toggle">
-          <input type="checkbox" id="auto-reveal" onchange="state.autoReveal=this.checked; saveState();">
-          <span class="toggle-track"></span>
-        </label>
-      </div>
-    </div>
   </section>
 
   <!-- COLLECTION TAB -->
@@ -157,6 +142,42 @@
             <div class="pity-fill" id="pity-legendary" style="width: 0%"></div>
           </div>
           <span class="pity-count" id="pity-legendary-count">0 / 50</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS TAB -->
+  <section class="tab-content" id="tab-settings">
+    <div class="settings-panel">
+      <h2>⚙️ Settings</h2>
+      <div class="setting-group">
+        <h3>Animation Speed</h3>
+        <p class="setting-desc">Controls how fast pack opening and card reveal animations play.</p>
+        <div class="setting-row">
+          <label for="anim-speed">Speed</label>
+          <input type="range" id="anim-speed" min="1" max="5" value="3" step="1" oninput="updateAnimSpeed(this.value)">
+          <span id="anim-speed-label">Normal</span>
+        </div>
+      </div>
+      <div class="setting-group">
+        <h3>Card Reveal</h3>
+        <p class="setting-desc">How cards appear after a pack opening.</p>
+        <div class="setting-row">
+          <label for="auto-reveal">Auto-Reveal Cards</label>
+          <label class="toggle">
+            <input type="checkbox" id="auto-reveal" onchange="state.autoReveal=this.checked; saveState();">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+      </div>
+      <div class="setting-group">
+        <h3>Data</h3>
+        <p class="setting-desc">Manage your save data.</p>
+        <div class="setting-actions">
+          <button class="btn-export" onclick="exportState()">Export Save</button>
+          <button class="btn-import" onclick="importState()">Import Save</button>
+          <button class="btn-reset" onclick="resetAll()">Reset All Data</button>
         </div>
       </div>
     </div>

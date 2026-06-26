@@ -557,18 +557,35 @@ header h1 {
   80% { transform: translateX(4px); }
 }
 
-/* ========== SETTINGS SECTION ========== */
-.settings-section {
-  margin-top: 24px;
-  background: var(--bg-card);
-  border-radius: 16px;
-  padding: 20px;
+/* ========== SETTINGS TAB ========== */
+.settings-panel {
+  max-width: 700px;
+  margin: 0 auto;
 }
 
-.settings-section h3 {
-  font-size: 1rem;
-  margin-bottom: 16px;
+.settings-panel h2 {
+  font-size: 1.5rem;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.setting-group {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.setting-group h3 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.setting-desc {
   color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 16px;
 }
 
 .setting-row {
@@ -640,6 +657,47 @@ header h1 {
 
 .toggle input:checked + .toggle-track::after {
   transform: translateX(20px);
+}
+
+.setting-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-export, .btn-import, .btn-reset {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-export {
+  background: linear-gradient(135deg, #2196f3, #1565c0);
+  color: white;
+}
+
+.btn-import {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: white;
+}
+
+.btn-reset {
+  background: linear-gradient(135deg, #f44336, #c62828);
+  color: white;
+}
+
+.btn-export:hover, .btn-import:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.btn-reset:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(244,67,54,0.3);
 }
 
 /* ========== DUPLICATE CONVERSION ========== */
