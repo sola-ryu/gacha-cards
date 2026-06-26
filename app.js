@@ -165,8 +165,8 @@ function showPackOpening(cards, packId) {
   const isLegendary = hasLegendary(cards);
   const isEpic = hasEpic(cards);
 
-  // Click to open
-  packClosed.onclick = () => {
+  // Click to open (pack box or backdrop)
+  function openPack() {
     packClosed.classList.add("hidden");
     packAnim.classList.remove("hidden"); // show animation after click
 
@@ -200,6 +200,15 @@ function showPackOpening(cards, packId) {
       showReveal(cards);
       recordPullHistory(cards);
     }, revealDelay);
+  }
+
+  packClosed.onclick = openPack;
+
+  // Also allow clicking the dark backdrop to open
+  overlay.onclick = (e) => {
+    if (e.target === overlay || e.target.id === "pack-opening") {
+      openPack();
+    }
   };
 }
 
