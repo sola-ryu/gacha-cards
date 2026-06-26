@@ -313,17 +313,107 @@ function spawnLegendaryParticles(cardEl) {
   const container = cardEl.querySelector(".legendary-particles");
   if (!container) return;
 
-  for (let i = 0; i < 12; i++) {
+  // Remove old particles
+  container.innerHTML = "";
+
+  // Golden sparkles (explosive burst outward)
+  for (let i = 0; i < 20; i++) {
     const p = document.createElement("div");
     p.className = "legendary-particle";
     p.style.left = "50%";
     p.style.top = "50%";
-    p.style.setProperty("--lx", (Math.random() - 0.5) * 120 + "px");
-    p.style.setProperty("--ly", (Math.random() - 0.5) * 120 + "px");
-    p.style.animationDelay = Math.random() * 3 + "s";
-    p.style.animationDuration = (1.5 + Math.random()) + "s";
+    p.style.setProperty("--lx", (Math.random() - 0.5) * 160 + "px");
+    p.style.setProperty("--ly", (Math.random() - 0.5) * 160 + "px");
+    p.style.animationDelay = Math.random() * 2 + "s";
+    p.style.animationDuration = (1.2 + Math.random() * 1.5) + "s";
+    const size = 4 + Math.random() * 6;
+    p.style.width = size + "px";
+    p.style.height = size + "px";
     container.appendChild(p);
   }
+
+  // Star-shaped particles (rotating, larger)
+  for (let i = 0; i < 10; i++) {
+    const s = document.createElement("div");
+    s.className = "legendary-star";
+    s.style.left = "50%";
+    s.style.top = "50%";
+    s.style.setProperty("--sx", (Math.random() - 0.5) * 140 + "px");
+    s.style.setProperty("--sy", (Math.random() - 0.5) * 140 + "px");
+    s.style.animationDelay = (0.3 + Math.random() * 2.5) + "s";
+    const size = 8 + Math.random() * 8;
+    s.style.width = size + "px";
+    s.style.height = size + "px";
+    container.appendChild(s);
+  }
+
+  // Sparkle bursts (4-point, quick flash)
+  for (let i = 0; i < 12; i++) {
+    const sp = document.createElement("div");
+    sp.className = "legendary-sparkle";
+    sp.style.left = "50%";
+    sp.style.top = "50%";
+    sp.style.setProperty("--px", (Math.random() - 0.5) * 180 + "px");
+    sp.style.setProperty("--py", (Math.random() - 0.5) * 180 + "px");
+    sp.style.animationDelay = (Math.random() * 3) + "s";
+    container.appendChild(sp);
+  }
+
+  // Firework ring particles (circular burst pattern)
+  const ringCount = 16;
+  for (let i = 0; i < ringCount; i++) {
+    const r = document.createElement("div");
+    r.className = "legendary-ring";
+    const angle = (i / ringCount) * Math.PI * 2;
+    const dist = 40 + Math.random() * 30;
+    r.style.left = "50%";
+    r.style.top = "50%";
+    r.style.setProperty("--rx", Math.cos(angle) * dist + "px");
+    r.style.setProperty("--ry", Math.sin(angle) * dist + "px");
+    r.style.animationDelay = (0.2 + Math.random() * 1.5) + "s";
+    container.appendChild(r);
+  }
+
+  // Ambient floating sparkles (drift upward slowly, continuous)
+  function spawnFloaters() {
+    for (let i = 0; i < 8; i++) {
+      const f = document.createElement("div");
+      f.className = "legendary-float";
+      f.style.left = (20 + Math.random() * 60) + "%";
+      f.style.top = (60 + Math.random() * 30) + "%";
+      f.style.setProperty("--fy", 40 + Math.random() * 40);
+      f.style.setProperty("--fx", (Math.random() - 0.5) * 20);
+      f.style.setProperty("--fd", (3 + Math.random() * 3) + "s");
+      f.style.animationDelay = Math.random() * 4 + "s";
+      const sz = 3 + Math.random() * 4;
+      f.style.width = sz + "px";
+      f.style.height = sz + "px";
+      container.appendChild(f);
+    }
+  }
+  spawnFloaters();
+  // Continuously spawn new floaters for persistent effect
+  setInterval(() => {
+    if (container.parentElement) spawnFloaters();
+  }, 4000);
+
+  // Tiny diamond particles (spinning as they fall)
+  for (let i = 0; i < 8; i++) {
+    const d = document.createElement("div");
+    d.className = "legendary-diamond";
+    d.style.left = "50%";
+    d.style.top = "50%";
+    d.style.setProperty("--dx", (Math.random() - 0.5) * 100 + "px");
+    d.style.setProperty("--dy", 30 + Math.random() * 60 + "px");
+    d.style.animationDelay = (0.5 + Math.random() * 3) + "s";
+    d.style.setProperty("--dd", (2 + Math.random() * 2) + "s");
+    container.appendChild(d);
+  }
+
+  // Glow pulse ring
+  const glowRing = document.createElement("div");
+  glowRing.className = "legendary-glow-ring";
+  container.appendChild(glowRing);
 }
 
 function closeReveal() {
