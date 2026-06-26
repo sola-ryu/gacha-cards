@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gacha Card Pack Opener</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>🎴 Gacha Card Pack</h1>
+    <div class="stats-bar">
+      <span class="stat"><strong id="total-pulls">0</strong> pulls</span>
+      <span class="stat"><strong id="total-cards">0</strong> cards</span>
+      <span class="stat"><strong id="unique-count">0</strong> unique</span>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="shop">Shop</button>
+    <button class="tab" data-tab="collection">Collection</button>
+    <button class="tab" data-tab="pity">Pity Counter</button>
+  </nav>
+
+  <!-- SHOP TAB -->
+  <section class="tab-content active" id="tab-shop">
+    <div class="packs-grid">
+      <div class="pack-card" data-pack="basic">
+        <div class="pack-preview">
+          <div class="pack-icon">📦</div>
+          <div class="pack-glow"></div>
+        </div>
+        <h3>Basic Pack</h3>
+        <p class="pack-cost">Free</p>
+        <div class="pack-rates">
+          <span class="rate common">Common 50%</span>
+          <span class="rate uncommon">Uncommon 30%</span>
+          <span class="rate rare">Rare 15%</span>
+          <span class="rate epic">Epic 4%</span>
+          <span class="rate legendary">Legendary 1%</span>
+        </div>
+        <button class="btn-pull" onclick="pull('basic', 1)">Pull x1</button>
+        <button class="btn-pull btn-multi" onclick="pull('basic', 10)">Pull x10</button>
+      </div>
+
+      <div class="pack-card" data-pack="premium">
+        <div class="pack-preview">
+          <div class="pack-icon">✨</div>
+          <div class="pack-glow gold"></div>
+        </div>
+        <h3>Premium Pack</h3>
+        <p class="pack-cost">💎 100 gems</p>
+        <div class="pack-rates">
+          <span class="rate uncommon">Uncommon 35%</span>
+          <span class="rate rare">Rare 35%</span>
+          <span class="rate epic">Epic 20%</span>
+          <span class="rate legendary">Legendary 10%</span>
+        </div>
+        <button class="btn-pull" onclick="pull('premium', 1)">Pull x1</button>
+        <button class="btn-pull btn-multi" onclick="pull('premium', 10)">Pull x10</button>
+      </div>
+
+      <div class="pack-card featured" data-pack="legendary">
+        <div class="pack-preview">
+          <div class="pack-icon">👑</div>
+          <div class="pack-glow legendary"></div>
+        </div>
+        <h3>Legendary Pack</h3>
+        <p class="pack-cost">💎 200 gems</p>
+        <div class="pack-rates">
+          <span class="rate rare">Rare 30%</span>
+          <span class="rate epic">Epic 40%</span>
+          <span class="rate legendary">Legendary 30%</span>
+        </div>
+        <button class="btn-pull" onclick="pull('legendary', 1)">Pull x1</button>
+        <button class="btn-pull btn-multi" onclick="pull('legendary', 10)">Pull x10</button>
+      </div>
+    </div>
+
+    <div class="gems-display">
+      💎 <span id="gem-count">500</span> gems
+    </div>
+
+    <div class="free-gems">
+      <button onclick="claimFreeGems()">Claim 50 Free Gems (every 24h)</button>
+    </div>
+  </section>
+
+  <!-- COLLECTION TAB -->
+  <section class="tab-content" id="tab-collection">
+    <div class="collection-controls">
+      <div class="search-bar">
+        <input type="text" id="search-cards" placeholder="Search cards..." oninput="filterCollection()">
+      </div>
+      <div class="rarity-filters">
+        <button class="filter-btn active" data-rarity="all" onclick="setFilter('all', this)">All</button>
+        <button class="filter-btn" data-rarity="common" onclick="setFilter('common', this)">Common</button>
+        <button class="filter-btn" data-rarity="uncommon" onclick="setFilter('uncommon', this)">Uncommon</button>
+        <button class="filter-btn" data-rarity="rare" onclick="setFilter('rare', this)">Rare</button>
+        <button class="filter-btn" data-rarity="epic" onclick="setFilter('epic', this)">Epic</button>
+        <button class="filter-btn" data-rarity="legendary" onclick="setFilter('legendary', this)">Legendary</button>
+      </div>
+    </div>
+    <div class="collection-grid" id="collection-grid"></div>
+  </section>
+
+  <!-- PITY TAB -->
+  <section class="tab-content" id="tab-pity">
+    <div class="pity-container">
+      <h2>Pity System</h2>
+      <p class="pity-desc">Guaranteed rare+ card every 15 pulls. Epic guaranteed at 30. Legendary guaranteed at 50.</p>
+      <div class="pity-bars">
+        <div class="pity-item">
+          <div class="pity-label">Rare+ Pity</div>
+          <div class="pity-track">
+            <div class="pity-fill" id="pity-rare" style="width: 0%"></div>
+          </div>
+          <span class="pity-count" id="pity-rare-count">0 / 15</span>
+        </div>
+        <div class="pity-item">
+          <div class="pity-label">Epic+ Pity</div>
+          <div class="pity-track">
+            <div class="pity-fill" id="pity-epic" style="width: 0%"></div>
+          </div>
+          <span class="pity-count" id="pity-epic-count">0 / 30</span>
+        </div>
+        <div class="pity-item">
+          <div class="pity-label">Legendary Pity</div>
+          <div class="pity-track">
+            <div class="pity-fill" id="pity-legendary" style="width: 0%"></div>
+          </div>
+          <span class="pity-count" id="pity-legendary-count">0 / 50</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OVERLAY: Pack Opening Animation -->
+  <div class="overlay hidden" id="pack-overlay">
+    <div class="overlay-content">
+      <div class="pack-opening" id="pack-opening">
+        <div class="pack-closed" id="pack-closed">
+          <div class="pack-box"></div>
+          <div class="pack-shimmer"></div>
+        </div>
+        <div class="pack-opening-anim hidden" id="pack-opening-anim">
+          <div class="flash"></div>
+          <div class="particles" id="particles"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERLAY: Card Reveal -->
+  <div class="overlay hidden" id="reveal-overlay">
+    <div class="reveal-container" id="reveal-container"></div>
+    <button class="btn-close-reveal" onclick="closeReveal()">Done</button>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
