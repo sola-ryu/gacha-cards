@@ -1,6 +1,15 @@
 // ========== STATE ==========
 let state = loadState();
 
+// Animation speed multiplier (1=slowest, 5=fastest)
+const ANIM_SPEED_LABELS = ['Very Slow', 'Slow', 'Normal', 'Fast', 'Instant'];
+let animSpeed = 3; // default normal
+
+function animDuration(baseMs) {
+  const factors = [4, 2.5, 1, 0.5, 0]; // speed 1-5 maps to multiplier
+  return Math.max(baseMs * factors[animSpeed - 1], 0);
+}
+
 function defaultState() {
   return {
     gems: 500,
@@ -11,6 +20,7 @@ function defaultState() {
     pityEpic: 0,      // pulls since last epic+
     pityLegendary: 0, // pulls since last legendary
     lastFreeGems: 0,  // timestamp of last free gems
+    autoReveal: false,
   };
 }
 
@@ -159,6 +169,9 @@ function showPackOpening(cards, packId) {
       p.style.setProperty("--tx", (Math.random() - 0.5) * 400 + "px");
       p.style.setProperty("--ty", (Math.random() - 0.5) * 400 + "px");
       p.style.animationDelay = Math.random() * 0.3 + "s";
+      // Scale animation duration by speed
+      const dur = animDuration(1000);
+      p.style.animationDuration = dur + "ms";
       particles.appendChild(p);
     }
 
@@ -166,7 +179,7 @@ function showPackOpening(cards, packId) {
     setTimeout(() => {
       overlay.classList.add("hidden");
       showReveal(cards);
-    }, 1000);
+    }, animDuration(1000));
   };
 }
 
@@ -211,12 +224,13 @@ function showReveal(cards) {
 
   overlay.classList.remove("hidden");
 
-  // Auto-flip all after delay
-  setTimeout(() => {
+  // Auto-flip all after delay if enabled
+  if (state.autoReveal) {
+    const flipDelay = animDuration(500);
     document.querySelectorAll(".reveal-card").forEach((el, i) => {
-      setTimeout(() => el.classList.add("flipped"), i * 200);
+      setTimeout(() => el.classList.add("flipped"), i * Math.max(animDuration(200), 50));
     });
-  }, 500);
+  }
 }
 
 function closeReveal() {
@@ -287,6 +301,9 @@ function renderCollection() {
 
     grid.appendChild(el);
   });
+
+  // Update dupe summary
+  updateDupeSummary();
 }
 
 function filterCollection() {
@@ -356,6 +373,81 @@ function claimFreeGems() {
   saveState();
   updateStats();
   alert("Claimed 50 free gems! 💎");
+}
+
+// ========== DUPLICATE CONVERSION ==========
+function getDupeGemValue(rarity) {
+  const values = { common: 5, uncommon: 15, rare: 40, epic: 100, legendary: 300 };
+  return values[rarity] || 0;
+}
+
+function calculateDupes() {
+  let totalGems = 0;
+  const dupeList = [];
+
+  for (const card of CARD_DB) {
+    const count = state.collection[card.id] || 0;
+    if (count > 3) {
+      const dupes = count - 3;
+      const gems = dupes * getDupeGemValue(card.rarity);
+      totalGems += gems;
+      dupeList.push({ card, dupes, gems });
+    }
+  }
+
+  return { totalGems, dupeList };
+}
+
+function updateDupeSummary() {
+  const { totalGems, dupeList } = calculateDupes();
+  const summary = document.getElementById("dupes-summary");
+
+  if (dupeList.length === 0) {
+    summary.innerHTML = '<span class="dupe-item" style="color:var(--text-secondary)">No duplicates to convert yet</span>';
+    return;
+  }
+
+  summary.innerHTML = dupeList.map(d => `
+    <div class="dupe-item" style="border-left:3px solid ${RARITY_COLORS[d.card.rarity]}">
+      ${d.card.emoji} ×${d.dupes} →
+      <span class="dupe-gems">+${d.gems} 💎</span>
+    </div>
+  `).join('') + `
+    <div class="dupe-total">Total: +${totalGems} 💎</div>
+  `;
+
+  // Update convert button state
+  const btn = document.querySelector(".btn-dupe-convert");
+  if (btn) btn.disabled = totalGems === 0;
+}
+
+function convertAllDupes() {
+  const { totalGems, dupeList } = calculateDupes();
+  if (totalGems === 0) return;
+
+  // Reduce collection counts
+  for (const d of dupeList) {
+    state.collection[d.card.id] -= d.dupes;
+    if (state.collection[d.card.id] <= 3) delete state.collection[d.card.id];
+  }
+
+  state.gems += totalGems;
+  saveState();
+  updateStats();
+  renderCollection();
+
+  alert(`Converted duplicates for +${totalGems} gems! 💎`);
+}
+
+function resetDupes() {
+  updateDupeSummary();
+}
+
+// ========== ANIMATION SPEED ==========
+function updateAnimSpeed(val) {
+  animSpeed = parseInt(val);
+  const label = document.getElementById("anim-speed-label");
+  label.textContent = ANIM_SPEED_LABELS[animSpeed - 1];
 }
 
 // ========== UTILS ==========

@@ -85,6 +85,22 @@
     <div class="free-gems">
       <button onclick="claimFreeGems()">Claim 50 Free Gems (every 24h)</button>
     </div>
+
+    <div class="settings-section">
+      <h3>⚙️ Settings</h3>
+      <div class="setting-row">
+        <label for="anim-speed">Animation Speed</label>
+        <input type="range" id="anim-speed" min="1" max="5" value="3" step="1" oninput="updateAnimSpeed(this.value)">
+        <span id="anim-speed-label">Normal</span>
+      </div>
+      <div class="setting-row">
+        <label for="auto-reveal">Auto-Reveal Cards</label>
+        <label class="toggle">
+          <input type="checkbox" id="auto-reveal" onchange="state.autoReveal=this.checked; saveState();">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
   </section>
 
   <!-- COLLECTION TAB -->
@@ -103,6 +119,16 @@
       </div>
     </div>
     <div class="collection-grid" id="collection-grid"></div>
+
+    <div class="dupes-section">
+      <h3>Duplicate Conversion</h3>
+      <p class="dupes-desc">Convert cards beyond your 3rd copy into gems.</p>
+      <div class="dupes-summary" id="dupes-summary"></div>
+      <div class="dupes-actions">
+        <button class="btn-dupe-convert" onclick="convertAllDupes()">Convert All</button>
+        <button class="btn-dupe-reset" onclick="resetDupes()">Reset Preview</button>
+      </div>
+    </div>
   </section>
 
   <!-- PITY TAB -->

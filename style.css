@@ -557,6 +557,193 @@ header h1 {
   80% { transform: translateX(4px); }
 }
 
+/* ========== SETTINGS SECTION ========== */
+.settings-section {
+  margin-top: 24px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.settings-section h3 {
+  font-size: 1rem;
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.setting-row label {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.setting-row input[type="range"] {
+  flex: 1;
+  max-width: 200px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+#anim-speed-label {
+  min-width: 60px;
+  text-align: right;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Toggle switch */
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-track {
+  width: 44px;
+  height: 24px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  position: relative;
+  transition: background 0.3s;
+  margin-left: 8px;
+}
+
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.3s;
+}
+
+.toggle input:checked + .toggle-track {
+  background: var(--accent);
+}
+
+.toggle input:checked + .toggle-track::after {
+  transform: translateX(20px);
+}
+
+/* ========== DUPLICATE CONVERSION ========== */
+.dupes-section {
+  margin-top: 24px;
+  background: linear-gradient(135deg, var(--bg-card), #1a2a1a);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+}
+
+.dupes-section h3 {
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.dupes-desc {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+
+.dupes-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 16px;
+  min-height: 36px;
+}
+
+.dupe-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  background: rgba(255,255,255,0.05);
+}
+
+.dupe-item .dupe-count {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dupe-item .dupe-gems {
+  color: #4fc3f7;
+  font-weight: 600;
+}
+
+.dupe-total {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #4fc3f7;
+  margin-bottom: 12px;
+}
+
+.dupes-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-dupe-convert {
+  padding: 10px 28px;
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-dupe-convert:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
+}
+
+.btn-dupe-convert:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-dupe-reset {
+  padding: 10px 28px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-dupe-reset:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--text-primary);
+}
+
 .reveal-art {
   height: 110px;
   width: 100%;
