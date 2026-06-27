@@ -543,6 +543,36 @@ header h1 {
   overflow: hidden;
 }
 
+.reveal-card-back.common { border: 2px solid var(--common); box-shadow: 0 4px 16px rgba(158,158,158,0.2); }
+.reveal-card-back.uncommon { border: 2px solid var(--uncommon); box-shadow: 0 4px 20px rgba(76,175,80,0.25); }
+.reveal-card-back.rare { border: 2px solid var(--rare); box-shadow: 0 4px 24px rgba(33,150,243,0.3); }
+.reveal-card-back.epic { border: 2px solid var(--epic); box-shadow: 0 4px 28px rgba(156,39,176,0.35); }
+.reveal-card-back.legendary { border: 2px solid var(--legendary); box-shadow: 0 4px 32px rgba(255,152,0,0.4); animation: legend-pulse 1s ease-in-out infinite; }
+
+@keyframes legend-pulse {
+  0%, 100% { box-shadow: 0 4px 32px rgba(255,152,0,0.4); }
+  50% { box-shadow: 0 4px 48px rgba(255,152,0,0.6), 0 0 80px rgba(255,152,0,0.2); }
+}
+
+/* ========== RARITY-SPECIFIC REVEAL EFFECTS ========== */
+.reveal-card.common {
+  animation: reveal-common 0.4s ease-out forwards;
+}
+
+@keyframes reveal-common {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.reveal-card.uncommon {
+  animation: reveal-uncommon 0.6s ease-out forwards;
+}
+
+@keyframes reveal-uncommon {
+  from { opacity: 0; transform: translateY(30px) scale(0.85); filter: blur(2px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
 .reveal-card.rare {
   animation: reveal-rare 0.8s ease-out forwards;
 }
