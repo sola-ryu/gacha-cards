@@ -506,6 +506,7 @@ header h1 {
   width: 150px;
   perspective: 800px;
   cursor: pointer;
+  opacity: 0;
 }
 
 .reveal-card-inner {
