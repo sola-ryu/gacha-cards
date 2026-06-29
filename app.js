@@ -121,9 +121,12 @@ function doPull(pack, packId) {
 
   const pity = state.pity[packId];
   // Pity thresholds per pack
-  const PITY_LEGENDARY = 100;
-  const PITY_EPIC = 50;
-  const PITY_RARE = 25;
+  const THRESHOLDS = {
+    basic:     { rare: 25, epic: 50, legendary: 100 },
+    premium:   { rare: 20, epic: 40, legendary: 80 },
+    legendary: { rare: 15, epic: 30, legendary: 60 },
+  };
+  const t = THRESHOLDS[packId] || THRESHOLDS.basic;
 
   for (const rarity of RARITY_ORDER) {
     const rate = pack.rates[rarity] || 0;
@@ -145,11 +148,11 @@ function doPull(pack, packId) {
   }
 
   // Pity override at threshold
-  if (pity.legendary >= PITY_LEGENDARY && pack.rates.legendary) {
+  if (pity.legendary >= t.legendary && pack.rates.legendary) {
     selectedRarity = "legendary";
-  } else if (pity.epic >= PITY_EPIC && selectedRarity !== "legendary" && pack.rates.epic) {
+  } else if (pity.epic >= t.epic && selectedRarity !== "legendary" && pack.rates.epic) {
     selectedRarity = "epic";
-  } else if (pity.rare >= PITY_RARE && RARITY_ORDER.indexOf(selectedRarity) < RARITY_ORDER.indexOf("rare") && pack.rates.rare) {
+  } else if (pity.rare >= t.rare && RARITY_ORDER.indexOf(selectedRarity) < RARITY_ORDER.indexOf("rare") && pack.rates.rare) {
     selectedRarity = "rare";
   }
 
@@ -613,9 +616,9 @@ function showCardDetail(card) {
 
 // ========== PITY UI ==========
 function updatePityUI() {
-  const PACKS_PITY = { basic: 25, premium: 25, legendary: 25 };
-  const PACKS_EPIC = { basic: 50, premium: 50, legendary: 50 };
-  const PACKS_LEG = { basic: 100, premium: 100, legendary: 100 };
+  const PACKS_PITY = { basic: 25, premium: 20, legendary: 15 };
+  const PACKS_EPIC = { basic: 50, premium: 40, legendary: 30 };
+  const PACKS_LEG = { basic: 100, premium: 80, legendary: 60 };
 
   for (const packId of ["basic", "premium", "legendary"]) {
     const p = state.pity[packId];
