@@ -20,7 +20,7 @@ function defaultState() {
       basic: { rare: 0, epic: 0, legendary: 0 },
       premium: { rare: 0, epic: 0, legendary: 0 },
       legendary: { rare: 0, epic: 0, legendary: 0 },
-    }
+    },
     lastFreeGems: 0,  // timestamp of last free gems
     autoReveal: false,
     pullHistory: [],   // [{ cardId, name, rarity, emoji, time }]
