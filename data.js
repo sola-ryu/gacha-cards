@@ -266,17 +266,23 @@ assignStats(CARD_DB.filter(c => c.rarity === "legendary"));
 const PACKS = {
   basic: {
     name: "Basic Pack",
-    rates: { common: 50, uncommon: 30, rare: 15, epic: 4, legendary: 1 },
+    // Legendary rate: ~0.001% (roughly 1 in 100,000 pulls)
+    rates: { common: 60, uncommon: 30, rare: 9.5, epic: 0.499, legendary: 0.001 },
     cost: 0,
+    // Rate limiting for free pulls
+    cooldownMs: 3000,         // min 3s between free pulls
+    maxPerDay: 10,            // max 10 free pulls per day
   },
   premium: {
     name: "Premium Pack",
     rates: { common: 0, uncommon: 35, rare: 35, epic: 20, legendary: 10 },
-    cost: 100,
+    cost: 500,
+    gemReward: 10,            // gems returned per pull
   },
   legendary: {
     name: "Legendary Pack",
     rates: { common: 0, uncommon: 0, rare: 30, epic: 40, legendary: 30 },
-    cost: 200,
+    cost: 1000,
+    gemReward: 200,           // gems returned per pull
   },
 };

@@ -12,7 +12,7 @@ function animDuration(baseMs) {
 
 function defaultState() {
   return {
-    gems: 500,
+    gems: 200,
     collection: {},    // { cardId: count }
     totalPulls: 0,
     totalCards: 0,
@@ -22,15 +22,31 @@ function defaultState() {
     lastFreeGems: 0,  // timestamp of last free gems
     autoReveal: false,
     pullHistory: [],   // [{ cardId, name, rarity, emoji, time }]
+    freePullCooldown: 0,   // timestamp when cooldown ends
+    freePullsToday: 0,     // count of free pulls today
+    freePullDate: null,    // date string of last reset
   };
 }
 
 function loadState() {
   try {
     const saved = localStorage.getItem("gacha_state");
-    if (saved) return { ...defaultState(), ...JSON.parse(saved) };
+    if (saved) {
+      const loaded = JSON.parse(saved);
+      const today = new Date().toISOString().slice(0, 10);
+      // Reset daily counters at midnight
+      if (loaded.freePullDate !== today) {
+        loaded.freePullsToday = 0;
+        loaded.freePullDate = today;
+        loaded.freePullCooldown = 0;
+      }
+      return { ...defaultState(), ...loaded };
+    }
   } catch {}
-  return defaultState();
+  const today = new Date().toISOString().slice(0, 10);
+  const fresh = defaultState();
+  fresh.freePullDate = today;
+  return fresh;
 }
 
 function saveState() {
@@ -49,12 +65,41 @@ function pull(packId, count) {
     return;
   }
 
+  // Free pack cooldown & daily cap check
+  if (packId === "basic") {
+    const now = Date.now();
+    // Check cooldown
+    if (state.freePullCooldown > now) {
+      const remaining = Math.ceil((state.freePullCooldown - now) / 1000);
+      alert(`Please wait ${remaining}s between free pulls.`);
+      return;
+    }
+    // Check daily limit
+    if (state.freePullsToday >= 10) {
+      alert("You've reached the daily limit of 10 free pulls. Come back tomorrow!");
+      return;
+    }
+  }
+
   state.gems -= totalCost;
 
   // Generate cards
   const results = [];
   for (let i = 0; i < count; i++) {
     results.push(doPull(pack));
+  }
+
+  // Track free pull cooldown & daily count
+  if (packId === "basic") {
+    state.freePullCooldown = Date.now() + 3000; // 3s cooldown
+    state.freePullsToday++;
+    const today = new Date().toISOString().slice(0, 10);
+    state.freePullDate = today;
+  }
+
+  // Apply gem reward for paid packs
+  if (pack.gemReward && packId !== "basic") {
+    state.gems += pack.gemReward * count;
   }
 
   saveState();
@@ -454,6 +499,34 @@ function updateStats() {
   document.getElementById("total-cards").textContent = state.totalCards;
   document.getElementById("unique-count").textContent = unique + "/" + CARD_DB.length;
   document.getElementById("gem-count").textContent = state.gems;
+
+  // Update free pack UI state
+  updateFreePackUI();
+}
+
+// ========== FREE PACK COOLDOWN UI ==========
+let cooldownInterval = null;
+
+function updateFreePackUI() {
+  const btn = document.querySelector('[data-pack="basic"] .btn-pull');
+  const label = document.querySelector('[data-pack="basic"] .pack-label');
+  if (!btn || !label) return;
+
+  const now = Date.now();
+  const remainingCooldown = Math.max(0, state.freePullCooldown - now);
+  const cooldownText = remainingCooldown > 0 ? ` (${Math.ceil(remainingCooldown / 1000)}s)` : "";
+  const dailyText = ` ${state.freePullsToday}/10 today`;
+
+  btn.disabled = remainingCooldown > 0 || state.freePullsToday >= 10;
+  btn.style.opacity = btn.disabled ? "0.5" : "1";
+  label.textContent = `Free Pull${cooldownText}${dailyText}`;
+}
+
+function startCooldownTimer() {
+  if (cooldownInterval) clearInterval(cooldownInterval);
+  cooldownInterval = setInterval(() => {
+    updateFreePackUI();
+  }, 200);
 }
 
 // ========== COLLECTION ==========
@@ -754,3 +827,5 @@ updateStats();
 updatePityUI();
 renderCollection();
 renderPullHistory();
+updateFreePackUI();
+startCooldownTimer();
