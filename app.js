@@ -16,9 +16,11 @@ function defaultState() {
     collection: {},    // { cardId: count }
     totalPulls: 0,
     totalCards: 0,
-    pityRare: 0,      // pulls since last rare+
-    pityEpic: 0,      // pulls since last epic+
-    pityLegendary: 0, // pulls since last legendary
+    pity: {           // per-pack pity counters
+      basic: { rare: 0, epic: 0, legendary: 0 },
+      premium: { rare: 0, epic: 0, legendary: 0 },
+      legendary: { rare: 0, epic: 0, legendary: 0 },
+    }
     lastFreeGems: 0,  // timestamp of last free gems
     autoReveal: false,
     pullHistory: [],   // [{ cardId, name, rarity, emoji, time }]
@@ -39,6 +41,10 @@ function loadState() {
         loaded.freePullsToday = 0;
         loaded.freePullDate = today;
         loaded.freePullCooldown = 0;
+      }
+      // Migrate old pity format to per-pack
+      if (!loaded.pity || !loaded.pity.basic) {
+        loaded.pity = { basic: { rare: loaded.pityRare || 0, epic: loaded.pityEpic || 0, legendary: loaded.pityLegendary || 0 }, premium: { rare: 0, epic: 0, legendary: 0 }, legendary: { rare: 0, epic: 0, legendary: 0 } };
       }
       return { ...defaultState(), ...loaded };
     }
@@ -86,7 +92,7 @@ function pull(packId, count) {
   // Generate cards
   const results = [];
   for (let i = 0; i < count; i++) {
-    results.push(doPull(pack));
+    results.push(doPull(pack, packId));
   }
 
   // Track free pull cooldown & daily count
@@ -109,23 +115,15 @@ function pull(packId, count) {
   showPackOpening(results, packId);
 }
 
-function doPull(pack) {
+function doPull(pack, packId) {
   let remaining = 100;
   let selectedRarity = null;
 
-  // Pity checks
-  if (state.pityLegendary >= 50 && !pack.rates.legendary) {
-    state.pityLegendary = 0;
-    return getCard("legendary");
-  }
-  if (state.pityEpic >= 30 && !pack.rates.epic) {
-    state.pityEpic = 0;
-    return getCard("epic");
-  }
-  if (state.pityRare >= 15 && !pack.rates.rare) {
-    state.pityRare = 0;
-    return getCard("rare");
-  }
+  const pity = state.pity[packId];
+  // Pity thresholds per pack
+  const PITY_LEGENDARY = 100;
+  const PITY_EPIC = 50;
+  const PITY_RARE = 25;
 
   for (const rarity of RARITY_ORDER) {
     const rate = pack.rates[rarity] || 0;
@@ -146,33 +144,35 @@ function doPull(pack) {
     }
   }
 
-  // Pity override: guarantee rare+ if pity reached
-  if (state.pityLegendary >= 50) selectedRarity = "legendary";
-  else if (state.pityEpic >= 30 && selectedRarity !== "legendary") selectedRarity = "epic";
-  else if (state.pityRare >= 15 && !RARITY_ORDER.indexOf(selectedRarity) < RARITY_ORDER.indexOf("rare")) selectedRarity = "rare";
+  // Pity override at threshold
+  if (pity.legendary >= PITY_LEGENDARY && pack.rates.legendary) {
+    selectedRarity = "legendary";
+  } else if (pity.epic >= PITY_EPIC && selectedRarity !== "legendary" && pack.rates.epic) {
+    selectedRarity = "epic";
+  } else if (pity.rare >= PITY_RARE && RARITY_ORDER.indexOf(selectedRarity) < RARITY_ORDER.indexOf("rare") && pack.rates.rare) {
+    selectedRarity = "rare";
+  }
 
   const card = getCard(selectedRarity);
 
-  // Update pity counters
+  // Update pity counters for this pack
   state.totalPulls++;
-  const ri = RARITY_ORDER.indexOf(selectedRarity);
-
   if (selectedRarity === "legendary") {
-    state.pityLegendary = 0;
-    state.pityEpic = 0;
-    state.pityRare = 0;
+    pity.legendary = 0;
+    pity.epic = 0;
+    pity.rare = 0;
   } else if (selectedRarity === "epic") {
-    state.pityEpic = 0;
-    state.pityRare = 0;
-    state.pityLegendary++;
+    pity.epic = 0;
+    pity.rare = 0;
+    pity.legendary++;
   } else if (selectedRarity === "rare") {
-    state.pityRare = 0;
-    state.pityEpic++;
-    state.pityLegendary++;
+    pity.rare = 0;
+    pity.epic++;
+    pity.legendary++;
   } else {
-    state.pityRare++;
-    state.pityEpic++;
-    state.pityLegendary++;
+    pity.rare++;
+    pity.epic++;
+    pity.legendary++;
   }
 
   return card;
@@ -613,17 +613,20 @@ function showCardDetail(card) {
 
 // ========== PITY UI ==========
 function updatePityUI() {
-  const rPct = Math.min((state.pityRare / 15) * 100, 100);
-  const ePct = Math.min((state.pityEpic / 30) * 100, 100);
-  const lPct = Math.min((state.pityLegendary / 50) * 100, 100);
+  const PACKS_PITY = { basic: 25, premium: 25, legendary: 25 };
+  const PACKS_EPIC = { basic: 50, premium: 50, legendary: 50 };
+  const PACKS_LEG = { basic: 100, premium: 100, legendary: 100 };
 
-  document.getElementById("pity-rare").style.width = rPct + "%";
-  document.getElementById("pity-epic").style.width = ePct + "%";
-  document.getElementById("pity-legendary").style.width = lPct + "%";
-
-  document.getElementById("pity-rare-count").textContent = `${state.pityRare} / 15`;
-  document.getElementById("pity-epic-count").textContent = `${state.pityEpic} / 30`;
-  document.getElementById("pity-legendary-count").textContent = `${state.pityLegendary} / 50`;
+  for (const packId of ["basic", "premium", "legendary"]) {
+    const p = state.pity[packId];
+    if (!p) continue;
+    const rareEl = document.getElementById(`pity-${packId === 'legendary' ? 'legendary-pack' : packId}-rare`);
+    const epicEl = document.getElementById(`pity-${packId === 'legendary' ? 'legendary-pack' : packId}-epic`);
+    const legEl = document.getElementById(`pity-${packId === 'legendary' ? 'legendary-pack' : packId}-legendary`);
+    if (rareEl) rareEl.textContent = `${p.rare}/${PACKS_PITY[packId]}`;
+    if (epicEl) epicEl.textContent = `${p.epic}/${PACKS_EPIC[packId]}`;
+    if (legEl) legEl.textContent = `${p.legendary}/${PACKS_LEG[packId]}`;
+  }
 }
 
 // ========== FREE GEMS ==========

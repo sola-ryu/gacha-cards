@@ -42,7 +42,6 @@
           <span class="rate epic">Epic 0.5%</span>
           <span class="rate legendary">Legendary 0.001%</span>
         </div>
-        <p class="pack-note">~1 in 100,000 for Legendary</p>
         <button class="btn-pull" onclick="pull('basic', 1)">Pull x1</button>
         <button class="btn-pull btn-multi" onclick="pull('basic', 10)">Pull x10</button>
       </div>
@@ -130,28 +129,31 @@
   <section class="tab-content" id="tab-pity">
     <div class="pity-container">
       <h2>Pity System</h2>
-      <p class="pity-desc">Guaranteed rare+ card every 15 pulls. Epic guaranteed at 30. Legendary guaranteed at 50.</p>
+      <p class="pity-desc">Per-pack counters. Guaranteed rare+ at 25, epic+ at 50, legendary at 100 pulls.</p>
       <div class="pity-bars">
-        <div class="pity-item">
-          <div class="pity-label">Rare+ Pity</div>
-          <div class="pity-track">
-            <div class="pity-fill" id="pity-rare" style="width: 0%"></div>
+        <div class="pity-item" id="pity-basic">
+          <div class="pity-label">Basic Pack</div>
+          <div class="pity-sub">
+            <span>Rare+ <span id="pity-basic-rare">0/25</span></span>
+            <span>Epic+ <span id="pity-basic-epic">0/50</span></span>
+            <span>Legendary <span id="pity-basic-legendary">0/100</span></span>
           </div>
-          <span class="pity-count" id="pity-rare-count">0 / 15</span>
         </div>
-        <div class="pity-item">
-          <div class="pity-label">Epic+ Pity</div>
-          <div class="pity-track">
-            <div class="pity-fill" id="pity-epic" style="width: 0%"></div>
+        <div class="pity-item" id="pity-premium">
+          <div class="pity-label">Premium Pack</div>
+          <div class="pity-sub">
+            <span>Rare+ <span id="pity-premium-rare">0/25</span></span>
+            <span>Epic+ <span id="pity-premium-epic">0/50</span></span>
+            <span>Legendary <span id="pity-premium-legendary">0/100</span></span>
           </div>
-          <span class="pity-count" id="pity-epic-count">0 / 30</span>
         </div>
-        <div class="pity-item">
-          <div class="pity-label">Legendary Pity</div>
-          <div class="pity-track">
-            <div class="pity-fill" id="pity-legendary" style="width: 0%"></div>
+        <div class="pity-item" id="pity-legendary-pack">
+          <div class="pity-label">Legendary Pack</div>
+          <div class="pity-sub">
+            <span>Rare+ <span id="pity-legendary-pack-rare">0/25</span></span>
+            <span>Epic+ <span id="pity-legendary-pack-epic">0/50</span></span>
+            <span>Legendary <span id="pity-legendary-pack-legendary">0/100</span></span>
           </div>
-          <span class="pity-count" id="pity-legendary-count">0 / 50</span>
         </div>
       </div>
     </div>
